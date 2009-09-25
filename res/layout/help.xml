@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:paddingLeft="16px"
+	android:paddingRight="16px">
+	<LinearLayout android:orientation="horizontal"
+		android:layout_height="fill_parent" android:layout_width="wrap_content"
+		android:layout_gravity="center_horizontal">
+		<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:src="@drawable/icon" />
+		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical" android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:paddingLeft="5px">
+			<TextView android:text="CraigsHome" android:textSize="16px"
+				android:layout_width="fill_parent" android:layout_height="wrap_content" />
+			<TextView android:text="CraigsList Rental Listings"
+				android:textSize="16px" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+	</LinearLayout>
+	<TextView
+		android:text="Click home icon once to show information, click again to show details."
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:gravity="center_horizontal" android:textSize="12px" android:paddingTop="32px" />
+	<TextView android:text="Double-click location to load listing for that area."
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:gravity="center_horizontal" android:textSize="12px"
+		android:paddingTop="16px" />
+</LinearLayout>

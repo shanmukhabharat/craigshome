@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, HouserMapActivity!</string>
+    <string name="app_name">CraigsHome</string>
+<string name="mylocation_menu">My Location</string>
+<string name="distance_menu">Distance</string>
+<string name="ok">Okay</string>
+<string name="help_menu">Help</string>
+</resources>

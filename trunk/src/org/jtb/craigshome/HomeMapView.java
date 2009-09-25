@@ -13,7 +13,7 @@ public class HomeMapView extends MapView {
 	private boolean center = false;
 	private float xClick = 0;
 	private float yClick = 0;
-	
+
 	public HomeMapView(Context context, String apiKey) {
 		super(context, apiKey);
 	}
@@ -22,11 +22,10 @@ public class HomeMapView extends MapView {
 		super(context, set);
 	}
 
-	public  boolean onTouchEvent(android.view.MotionEvent ev) {
-		if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-			center = true;
-		} else if (ev.getAction() == MotionEvent.ACTION_UP) {
-			if (center && lastTouch + 1000 > System.currentTimeMillis() && ev.getX() == xClick && ev.getY() == yClick) {
+	public boolean onTouchEvent(android.view.MotionEvent ev) {
+		if (ev.getAction() == MotionEvent.ACTION_UP) {
+			if (center && lastTouch + 1000 > System.currentTimeMillis()
+					&& ev.getX() == xClick && ev.getY() == yClick) {
 				Projection projection = getProjection();
 				GeoPoint gp = projection.fromPixels(((int) ev.getX()),
 						((int) ev.getY()));
@@ -34,11 +33,13 @@ public class HomeMapView extends MapView {
 				HomeMapActivity hma = (HomeMapActivity) getContext();
 				hma.setLocation(gp);
 				hma.load();
+				center = false;
+			} else {
+				xClick = ev.getX();
+				yClick = ev.getY();
+				center = true;
 			}
-			xClick = ev.getX();
-			yClick = ev.getY();			
 			lastTouch = System.currentTimeMillis();
-			center = false;
 		} else if (ev.getAction() == MotionEvent.ACTION_MOVE) {
 			xClick = yClick = 0;
 			center = false;

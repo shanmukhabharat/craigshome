@@ -1,5 +1,6 @@
 package org.jtb.craigshome;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jtb.jrentrent.Listing;
@@ -13,16 +14,20 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -37,6 +42,8 @@ public class HomeMapActivity extends MapActivity {
 	static final int HELP_DIALOG = 3;
 	static final int LOAD_ERROR_DIALOG = 4;
 	static final int NO_LISTINGS_DIALOG = 5;
+	static final int ZIP_DIALOG = 6;
+	static final int ZIP_ERROR_DIALOG = 7;
 
 	static final int LOADING_DIALOG_SHOW_WHAT = 0;
 	static final int LOADING_DIALOG_DISMISS_WHAT = 1;
@@ -45,9 +52,10 @@ public class HomeMapActivity extends MapActivity {
 	static final int UPDATE_WHAT = 4;
 
 	private static final int MYLOCATION_MENU = 0;
-	private static final int DISTANCE_MENU = 1;
-	private static final int TYPE_MENU = 2;
-	private static final int HELP_MENU = 3;
+	private static final int ZIP_MENU = 1;
+	private static final int DISTANCE_MENU = 2;
+	private static final int TYPE_MENU = 3;
+	private static final int HELP_MENU = 4;
 
 	private Handler mHandler = new Handler() {
 		@Override
@@ -77,6 +85,8 @@ public class HomeMapActivity extends MapActivity {
 	private AlertDialog mHelpDialog;
 	private AlertDialog mLoadErrorDialog;
 	private AlertDialog mNoListingsDialog;
+	private AlertDialog mZipDialog;
+	private AlertDialog mZipErrorDialog;
 
 	private org.jtb.jrentrent.Location mLocation = new org.jtb.jrentrent.Location();
 	private MapView mMapView;
@@ -108,6 +118,12 @@ public class HomeMapActivity extends MapActivity {
 	public void setLocation(GeoPoint gp) {
 		mLocation.setLatitudeE6(gp.getLatitudeE6());
 		mLocation.setLongitudeE6(gp.getLongitudeE6());
+		mMapView.getController().animateTo(mLocation.getGeoPoint());
+	}
+
+	public void setLocation(double latitude, double longitude) {
+		mLocation.setLatitude(latitude);
+		mLocation.setLongitude(longitude);
 		mMapView.getController().animateTo(mLocation.getGeoPoint());
 	}
 
@@ -256,6 +272,43 @@ public class HomeMapActivity extends MapActivity {
 			});
 			mDistanceDialog = builder.create();
 			return mDistanceDialog;
+		case ZIP_DIALOG:
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View zipView = factory.inflate(R.layout.zip_dialog, null);
+            final EditText zipEdit = (EditText)zipView.findViewById(R.id.zip);
+            mZipDialog = new AlertDialog.Builder(this)
+                .setTitle("Go to Zip")
+                .setView(zipView)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    	String zip = zipEdit.getText().toString();
+                    	Geocoder gc = new Geocoder(mHomeMapActivity);
+                    	try {
+							List<Address> addrs = gc.getFromLocationName(zip, 1);
+							if (addrs.size() == 0) {
+								Log.e(getClass().getSimpleName(), "could not geocode zip: " + zip);
+								showDialog(ZIP_ERROR_DIALOG);
+								return;
+							}
+							Address a = addrs.get(0);
+							setLocation(a.getLatitude(), a.getLongitude());
+							load();
+						} catch (IOException e) {
+							Log.e(getClass().getSimpleName(), "could not geocode zip: " + zip, e);
+							showDialog(ZIP_ERROR_DIALOG);
+							return;
+						}
+			
+                    	dismissDialog(ZIP_DIALOG);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    	dismissDialog(ZIP_DIALOG);
+                    }
+                })
+                .create();
+            return mZipDialog;
 		case LOAD_ERROR_DIALOG:
 			builder = new AlertDialog.Builder(this);
 			builder.setTitle("Error");
@@ -269,6 +322,19 @@ public class HomeMapActivity extends MapActivity {
 					});
 			mLoadErrorDialog = builder.create();
 			return mLoadErrorDialog;
+		case ZIP_ERROR_DIALOG:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("Error");
+			builder
+					.setMessage("Could not find location for zip code.");
+			builder.setNeutralButton(R.string.ok,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dismissDialog(LOAD_ERROR_DIALOG);
+						}
+					});
+			mZipErrorDialog = builder.create();
+			return mZipErrorDialog;
 		case NO_LISTINGS_DIALOG:
 			builder = new AlertDialog.Builder(this);
 			builder.setTitle("Warning");
@@ -296,10 +362,12 @@ public class HomeMapActivity extends MapActivity {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MYLOCATION_MENU, 0, R.string.mylocation_menu).setIcon(
 				R.drawable.mylocation);
-		menu.add(0, DISTANCE_MENU, 1, R.string.distance_menu).setIcon(
+		menu.add(0, ZIP_MENU, 1, R.string.zip_menu).setIcon(
+				R.drawable.zip);
+		menu.add(0, DISTANCE_MENU, 2, R.string.distance_menu).setIcon(
 				R.drawable.distance);
-		menu.add(0, TYPE_MENU, 2, R.string.type_menu).setIcon(R.drawable.type);
-		menu.add(0, HELP_MENU, 3, R.string.help_menu).setIcon(R.drawable.help);
+		menu.add(0, TYPE_MENU, 3, R.string.type_menu).setIcon(R.drawable.type);
+		menu.add(0, HELP_MENU, 4, R.string.help_menu).setIcon(R.drawable.help);
 		return result;
 	}
 
@@ -312,6 +380,9 @@ public class HomeMapActivity extends MapActivity {
 			return true;
 		case DISTANCE_MENU:
 			showDialog(DISTANCE_DIALOG);
+			return true;
+		case ZIP_MENU:
+			showDialog(ZIP_DIALOG);
 			return true;
 		case TYPE_MENU:
 			showDialog(TYPE_DIALOG);

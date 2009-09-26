@@ -9,4 +9,6 @@
 <string name="cl_menu">View on CraigsList</string>
 <string name="type_menu">Listing Type</string>
 
+<string name="zip_menu">Go to Zip</string>
+<string name="cancel">Cancel</string>
 </resources>

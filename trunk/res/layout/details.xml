@@ -9,10 +9,16 @@
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:gravity="left" android:paddingTop="4px"
 			android:paddingBottom="4px" android:paddingLeft="4px" />
+		<TextView android:id="@+id/date"
+			android:text="Saturday, September 5 2009 at 11:53AM"
+			android:textColor="#0033ff" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingLeft="4px" />
 		<TextView android:id="@+id/header"
 			android:text="$1200 Some interesting description of the property that is very long to check and see how things wrap"
 			android:textColor="#0033ff" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingTop="8px"
 			android:paddingLeft="4px" />
 		<LinearLayout android:paddingTop="8px"
 			android:orientation="horizontal" android:layout_width="wrap_content"

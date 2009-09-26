@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import org.json.JSONObject;
 public class Listing implements Serializable {
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-			"M/dd/yyyy h:mm:ss");
+	"M/dd/yyyy h:mm:ss");
+	private static final DateFormat DISPLAY_DATE_FORMAT = new SimpleDateFormat(
+	"EEE, MMM d hh:mma");
 	private String id;
 	private int price;
 	private String url;
@@ -136,5 +139,31 @@ public class Listing implements Serializable {
 
 	public List<String> getImageUrls() {
 		return imageUrls;
+	}
+	
+	public String getDisplayDateString() {
+		Calendar now = Calendar.getInstance();
+		Calendar posted = Calendar.getInstance();
+		posted.setTime(date);
+		
+		int nowDay = now.get(Calendar.DAY_OF_YEAR);
+		int postedDay = posted.get(Calendar.DAY_OF_YEAR);
+	
+		int diff = nowDay - postedDay;
+		
+		StringBuilder sb = new StringBuilder();
+		if (diff == 0) {
+			sb.append("Posted today");	
+		} else if (diff == 1) {
+			sb.append("Posted yesterday");
+		} else {
+			sb.append(diff);
+			sb.append(" days ago");
+		}
+		sb.append(" (");
+		sb.append(DISPLAY_DATE_FORMAT.format(date));
+		sb.append(")");
+		
+		return sb.toString();
 	}
 }

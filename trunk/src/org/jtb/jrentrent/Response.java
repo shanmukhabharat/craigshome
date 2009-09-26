@@ -17,8 +17,8 @@ public class Response {
         //System.out.println(jo);
 
         status = new Status(jo);
+        listings = new ArrayList<Listing>();
         if (status.isSuccess()) {
-            listings = new ArrayList<Listing>();
             JSONObject data = jo.getJSONObject("Data");
             JSONArray ids = data.names();
             for (int i = 0; i < ids.length(); i++) {

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.jtb.jrentrent.Listing;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,11 +35,14 @@ public class ListingOverlay extends ItemizedOverlay {
 	private Listing listing;
 	private boolean tapped = false;
 	private MapView mMapView;
-	
-	public ListingOverlay(Drawable defaultMarker, MapView mapView, Listing listing) {
+	private Context mContext;
+
+	public ListingOverlay(Drawable defaultMarker, Context context,
+			MapView mapView, Listing listing) {
 		super(boundCenterBottom(defaultMarker));
 		this.mMapView = mapView;
 		this.listing = listing;
+		this.mContext = context;
 	}
 
 	@Override
@@ -59,14 +64,22 @@ public class ListingOverlay extends ItemizedOverlay {
 	protected boolean onTap(int i) {
 		Log.d(getClass().getSimpleName(), "listing: " + listing);
 		Log.d(getClass().getSimpleName(), "url: " + listing.getUrl());
+
+		boolean alreadyTapped = tapped;
 		tapped = !tapped;
-		
+
 		if (tapped) {
 			Projection projection = mMapView.getProjection();
 			GeoPoint gp = listing.getLocation().getGeoPoint();
 			mMapView.getController().animateTo(gp);
 		}
-		
+
+		if (alreadyTapped) {
+			Intent intent = new Intent(mContext, DetailsActivity.class);
+			intent.putExtra("org.jtb.craigshome.listing", listing);
+			mContext.startActivity(intent);
+		}
+
 		return (true);
 	}
 
@@ -80,20 +93,22 @@ public class ListingOverlay extends ItemizedOverlay {
 
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
+		Projection projection = mapView.getProjection();
+		Point point = new Point();
+		projection.toPixels(listing.getLocation().getGeoPoint(), point);
+
 		if (shadow) {
 			super.draw(canvas, mapView, false);
-			// Bitmap b = BitmapFactory.decodeResource(resources,
-			// R.drawable.home_16);
-			// canvas.drawBitmap(b, point.x, point.y, new Paint());
+			if (listing.getImageUrls().size() > 0) {
+				Bitmap b = BitmapFactory.decodeResource(
+						mContext.getResources(), R.drawable.camera);
+				canvas.drawBitmap(b, point.x - 15, point.y - 25, new Paint());
+			}
 			return;
 		}
 		if (!tapped) {
 			return;
 		}
-
-		Projection projection = mapView.getProjection();
-		Point point = new Point();
-		projection.toPixels(listing.getLocation().getGeoPoint(), point);
 
 		Paint bgOutlinePaint = new Paint();
 		Paint bgGlowPaint = new Paint();
@@ -108,7 +123,7 @@ public class ListingOverlay extends ItemizedOverlay {
 		bgOutlinePaint.setAlpha(128);
 		bgOutlinePaint.setAntiAlias(true);
 
-		bgGlowPaint.setColor(Color.parseColor("#cceeff"));
+		bgGlowPaint.setColor(Color.parseColor("#ccccff"));
 		// bgGlowPaint.setStyle(Paint.Style.STROKE);
 		// bgGlowPaint.setStrokeWidth(2);
 		bgGlowPaint.setAlpha(128);
@@ -197,7 +212,7 @@ public class ListingOverlay extends ItemizedOverlay {
 		canvas.drawRoundRect(rect, 2, 2, bgPaint);
 
 		canvas.drawRoundRect(rectCall, 2, 2, bgPaint);
-		
+
 		canvas.drawText(s1, t1x, t1y, boldTextPaint);
 		canvas.drawText(s2, t2x, t2y, textPaint);
 		canvas.drawText(s3, t3x, t3y, textPaint);

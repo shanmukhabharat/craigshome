@@ -1,5 +1,7 @@
 package org.jtb.craigshome;
 
+import java.security.KeyRep.Type;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -85,5 +87,13 @@ public class Prefs {
 	
 	public void setDistance(int distance) {
 		setInt("distance", distance);
+	}
+	
+	public org.jtb.jrentrent.Type getType() {
+		return org.jtb.jrentrent.Type.valueOf(getString("type", org.jtb.jrentrent.Type.RENTAL_APARTMENTS_HOUSES.toString()));
+	}
+	
+	public void setType(org.jtb.jrentrent.Type type) {
+		setString("type", type.toString());
 	}
 }

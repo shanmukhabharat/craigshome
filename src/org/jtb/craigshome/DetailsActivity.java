@@ -32,6 +32,9 @@ public class DetailsActivity extends Activity {
 					.get("org.jtb.craigshome.listing") : null;
 		}
 
+		TextView dateTv = (TextView) findViewById(R.id.date);
+		dateTv.setText(mListing.getDisplayDateString());
+
 		TextView headerTv = (TextView) findViewById(R.id.header);
 		headerTv.setText(mListing.getHeader());
 
@@ -44,7 +47,7 @@ public class DetailsActivity extends Activity {
 		}
 
 		TextView baTv = (TextView) findViewById(R.id.bathrooms);
-		int ba = mListing.getBedrooms();
+		int ba = mListing.getBathrooms();
 		if (ba == 0) {
 			baTv.setText("?");
 		} else {

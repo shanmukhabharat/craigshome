@@ -22,9 +22,9 @@
 	<TextView
 		android:text="Click home icon once to show information, click again to show details."
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:gravity="center_horizontal" android:textSize="12px" android:paddingTop="32px" />
-	<TextView android:text="Double-click location to load listing for that area."
+		android:gravity="left" android:textSize="12px" android:paddingTop="32px" />
+	<TextView android:text="Long-click map to load listings for that area."
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:gravity="center_horizontal" android:textSize="12px"
+		android:textSize="12px"
 		android:paddingTop="16px" />
 </LinearLayout>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="#ffffff" android:layout_height="fill_parent"
+	android:layout_width="fill_parent">
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<TextView android:text="Description" android:textColor="#0033ff"
+			android:background="#ccccff" android:textStyle="bold"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:gravity="left" android:paddingTop="4px"
+			android:paddingBottom="4px" android:paddingLeft="4px" />
+		<TextView android:id="@+id/header"
+			android:text="$1200 Some interesting description of the property that is very long to check and see how things wrap"
+			android:textColor="#0033ff" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingLeft="4px" />
+		<LinearLayout android:paddingTop="8px"
+			android:orientation="horizontal" android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+			<TextView android:text="Bedrooms:" android:textColor="#0033ff"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:gravity="left" android:paddingLeft="4px"
+				android:layout_weight="1" />
+			<TextView android:id="@+id/bedrooms" android:text="2"
+				android:textStyle="bold" android:textColor="#0033ff"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:gravity="left" android:paddingLeft="4px"
+				android:layout_weight="1" />
+			<TextView android:text="Bathrooms" android:layout_weight="1"
+				android:textColor="#0033ff" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:gravity="left"
+				android:paddingLeft="4px" />
+			<TextView android:id="@+id/bathrooms" android:text="1.5"
+				android:textStyle="bold" android:textColor="#0033ff"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:gravity="left" android:paddingLeft="4px"
+				android:layout_weight="1" />
+		</LinearLayout>
+		<TextView android:text="Address" android:textColor="#0033ff"
+			android:textStyle="bold" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingTop="4px" android:paddingBottom="4px"
+			android:paddingLeft="4px" android:background="#ccccff"
+			android:layout_marginTop="8px" />
+		<TextView android:id="@+id/address" android:text="17228 17th Ave. West"
+			android:textColor="#0033ff" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingLeft="4px" />
+		<LinearLayout android:orientation="horizontal"
+			android:layout_width="wrap_content" android:layout_height="wrap_content">
+			<TextView android:id="@+id/city" android:text="Lynwood"
+				android:textColor="#0033ff" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:gravity="left"
+				android:paddingLeft="4px" android:layout_weight="1" />
+			<TextView android:id="@+id/zip" android:text="98036"
+				android:layout_weight="1" android:textColor="#0033ff"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:gravity="left" android:paddingLeft="4px" />
+		</LinearLayout>
+		<TextView android:text="Contact" android:textColor="#0033ff"
+			android:textStyle="bold" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingTop="4px" android:paddingBottom="4px"
+			android:paddingLeft="4px" android:background="#ccccff"
+			android:layout_marginTop="8px" />
+		<TextView android:id="@+id/contact" android:text="foo.bar@farble.nickle.org"
+			android:textColor="#0033ff" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingLeft="4px" android:autoLink="email" />
+		<TextView android:text="Pictures" android:textColor="#0033ff"
+			android:textStyle="bold" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="left"
+			android:paddingTop="4px" android:paddingBottom="4px"
+			android:paddingLeft="4px" android:background="#ccccff"
+			android:layout_marginTop="12px" />
+		<Gallery android:id="@+id/gallery" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" />
+		<TextView android:id="@+id/no_pictures" android:text="No pictures."
+			android:textColor="#0033ff" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:paddingLeft="4px"
+			android:autoLink="email" />
+	</LinearLayout>
+</ScrollView>

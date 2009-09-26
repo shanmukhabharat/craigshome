@@ -6,4 +6,7 @@
 <string name="distance_menu">Distance</string>
 <string name="ok">Okay</string>
 <string name="help_menu">Help</string>
+<string name="cl_menu">View on CraigsList</string>
+<string name="type_menu">Listing Type</string>
+
 </resources>

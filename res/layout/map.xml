@@ -2,9 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/map_layout" android:orientation="vertical"
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
-	<!-- debug key -->
+	<!-- debug key
 	<org.jtb.craigshome.HomeMapView
 		android:id="@+id/map_view" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:clickable="true"
 		android:apiKey="0K5NJoeJ_SeWpvO5nOpgeGK0NBngXra-HvlKLVg" />
+		-->
+	<!-- release key -->
+	<org.jtb.craigshome.HomeMapView
+		android:id="@+id/map_view" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:clickable="true"
+		android:apiKey="0K5NJoeJ_SeVpTuRHV_kwgVWs7nWVN5IrovxvWQ" />
 </RelativeLayout>

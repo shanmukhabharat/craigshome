@@ -1,8 +1,10 @@
 package org.jtb.jrentrent;
 
+import java.io.Serializable;
+
 import com.google.android.maps.GeoPoint;
 
-public class Location {
+public class Location implements Serializable {
 
     private double latitude;
     private double longitude;

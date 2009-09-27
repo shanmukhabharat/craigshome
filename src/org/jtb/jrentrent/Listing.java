@@ -157,6 +157,7 @@ public class Listing implements Serializable {
 		} else if (diff == 1) {
 			sb.append("Posted yesterday");
 		} else {
+			sb.append("Posted ");
 			sb.append(diff);
 			sb.append(" days ago");
 		}

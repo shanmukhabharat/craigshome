@@ -43,7 +43,8 @@ public class HomeMapActivity extends MapActivity {
 	static final int LOAD_ERROR_DIALOG = 4;
 	static final int NO_LISTINGS_DIALOG = 5;
 	static final int ZIP_DIALOG = 6;
-	static final int ZIP_ERROR_DIALOG = 7;
+	static final int GEOCODE_ERROR_DIALOG = 7;
+	static final int LOCATION_ERROR_DIALOG = 8;
 
 	static final int LOADING_DIALOG_SHOW_WHAT = 0;
 	static final int LOADING_DIALOG_DISMISS_WHAT = 1;
@@ -86,7 +87,8 @@ public class HomeMapActivity extends MapActivity {
 	private AlertDialog mLoadErrorDialog;
 	private AlertDialog mNoListingsDialog;
 	private AlertDialog mZipDialog;
-	private AlertDialog mZipErrorDialog;
+	private AlertDialog mGeocodeErrorDialog;
+	private AlertDialog mLocationErrorDialog;
 
 	private org.jtb.jrentrent.Location mLocation = new org.jtb.jrentrent.Location();
 	private MapView mMapView;
@@ -94,37 +96,60 @@ public class HomeMapActivity extends MapActivity {
 	private Response mResponse;
 	private HomeMapActivity mHomeMapActivity;
 
-	private void setLocation() {
-		synchronized (mMapView) {
-			LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-			String name = lm.getBestProvider(new Criteria(), true);
-			if (name == null) {
-				// TODO: error dialog an exit (this.finish())?
-				Log.e(getClass().getSimpleName(),
-						"no best location provider returned");
-				mLocation = null;
-				return;
+	private boolean setLocation() {
+		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		String name = lm.getBestProvider(new Criteria(), true);
+		if (name == null) {
+			Log.w(getClass().getSimpleName(), "no location provider returned");
+			showDialog(LOCATION_ERROR_DIALOG);
+			return false;
+		}
+
+		// LocationProvider lp = lm.getProvider(name);
+		Location l = lm.getLastKnownLocation(name);
+
+		mLocation.setLatitude(l.getLatitude());
+		mLocation.setLongitude(l.getLongitude());
+
+		mMapView.getController().animateTo(mLocation.getGeoPoint());
+		return true;
+	}
+
+	private boolean setLocation(String addr) {
+		Geocoder gc = new Geocoder(this);
+		List<Address> addrs;
+		try {
+			addrs = gc.getFromLocationName(addr, 1);
+			if (addrs.size() == 0) {
+				Log.w(getClass().getSimpleName(), "could not geocode address: "
+						+ addr);
+				showDialog(GEOCODE_ERROR_DIALOG);
+				return false;
 			}
-			// LocationProvider lp = lm.getProvider(name);
-			Location l = lm.getLastKnownLocation(name);
-
-			mLocation.setLatitude(l.getLatitude());
-			mLocation.setLongitude(l.getLongitude());
-
+			Address a = addrs.get(0);
+			setLocation(a.getLatitude(), a.getLongitude());
 			mMapView.getController().animateTo(mLocation.getGeoPoint());
+			return true;
+		} catch (IOException e) {
+			Log.w(getClass().getSimpleName(), "could not geocode address: "
+					+ addr);
+			showDialog(GEOCODE_ERROR_DIALOG);
+			return false;
 		}
 	}
 
-	public void setLocation(GeoPoint gp) {
+	public boolean setLocation(GeoPoint gp) {
 		mLocation.setLatitudeE6(gp.getLatitudeE6());
 		mLocation.setLongitudeE6(gp.getLongitudeE6());
 		mMapView.getController().animateTo(mLocation.getGeoPoint());
+		return true;
 	}
 
-	public void setLocation(double latitude, double longitude) {
+	public boolean setLocation(double latitude, double longitude) {
 		mLocation.setLatitude(latitude);
 		mLocation.setLongitude(longitude);
 		mMapView.getController().animateTo(mLocation.getGeoPoint());
+		return true;
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -144,11 +169,9 @@ public class HomeMapActivity extends MapActivity {
 			}
 		});
 
-		setLocation();
-		Log.d(getClass().getSimpleName(), "mLocation: " + mLocation);
-
-		mMapView.getController().setZoom(16);
-		load();
+		if (setLocation()) {
+			load();
+		}
 	}
 
 	private void setZoom(Request request) {
@@ -273,42 +296,28 @@ public class HomeMapActivity extends MapActivity {
 			mDistanceDialog = builder.create();
 			return mDistanceDialog;
 		case ZIP_DIALOG:
-            LayoutInflater factory = LayoutInflater.from(this);
-            final View zipView = factory.inflate(R.layout.zip_dialog, null);
-            final EditText zipEdit = (EditText)zipView.findViewById(R.id.zip);
-            mZipDialog = new AlertDialog.Builder(this)
-                .setTitle("Go to Zip")
-                .setView(zipView)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    	String zip = zipEdit.getText().toString();
-                    	Geocoder gc = new Geocoder(mHomeMapActivity);
-                    	try {
-							List<Address> addrs = gc.getFromLocationName(zip, 1);
-							if (addrs.size() == 0) {
-								Log.e(getClass().getSimpleName(), "could not geocode zip: " + zip);
-								showDialog(ZIP_ERROR_DIALOG);
-								return;
-							}
-							Address a = addrs.get(0);
-							setLocation(a.getLatitude(), a.getLongitude());
-							load();
-						} catch (IOException e) {
-							Log.e(getClass().getSimpleName(), "could not geocode zip: " + zip, e);
-							showDialog(ZIP_ERROR_DIALOG);
-							return;
-						}
-			
-                    	dismissDialog(ZIP_DIALOG);
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    	dismissDialog(ZIP_DIALOG);
-                    }
-                })
-                .create();
-            return mZipDialog;
+			LayoutInflater factory = LayoutInflater.from(this);
+			final View zipView = factory.inflate(R.layout.zip_dialog, null);
+			final EditText zipEdit = (EditText) zipView.findViewById(R.id.zip);
+			mZipDialog = new AlertDialog.Builder(this).setTitle("Go to Zip")
+					.setView(zipView).setPositiveButton(R.string.ok,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+									String zip = zipEdit.getText().toString();
+									if (setLocation(zip)) {
+										load();
+									}
+									dismissDialog(ZIP_DIALOG);
+								}
+							}).setNegativeButton(R.string.cancel,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+									dismissDialog(ZIP_DIALOG);
+								}
+							}).create();
+			return mZipDialog;
 		case LOAD_ERROR_DIALOG:
 			builder = new AlertDialog.Builder(this);
 			builder.setTitle("Error");
@@ -322,19 +331,31 @@ public class HomeMapActivity extends MapActivity {
 					});
 			mLoadErrorDialog = builder.create();
 			return mLoadErrorDialog;
-		case ZIP_ERROR_DIALOG:
+		case LOCATION_ERROR_DIALOG:
 			builder = new AlertDialog.Builder(this);
-			builder.setTitle("Error");
+			builder.setTitle("Warning");
 			builder
-					.setMessage("Could not find location for zip code.");
+					.setMessage("Could not determine your location. Enable network or GPS location services, or use Menu>Go to Zip.");
 			builder.setNeutralButton(R.string.ok,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							dismissDialog(LOAD_ERROR_DIALOG);
+							dismissDialog(LOCATION_ERROR_DIALOG);
 						}
 					});
-			mZipErrorDialog = builder.create();
-			return mZipErrorDialog;
+			mLocationErrorDialog = builder.create();
+			return mLocationErrorDialog;
+		case GEOCODE_ERROR_DIALOG:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("Error");
+			builder.setMessage("Could not find location for address / zip.");
+			builder.setNeutralButton(R.string.ok,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dismissDialog(GEOCODE_ERROR_DIALOG);
+						}
+					});
+			mGeocodeErrorDialog = builder.create();
+			return mGeocodeErrorDialog;
 		case NO_LISTINGS_DIALOG:
 			builder = new AlertDialog.Builder(this);
 			builder.setTitle("Warning");
@@ -362,8 +383,7 @@ public class HomeMapActivity extends MapActivity {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MYLOCATION_MENU, 0, R.string.mylocation_menu).setIcon(
 				R.drawable.mylocation);
-		menu.add(0, ZIP_MENU, 1, R.string.zip_menu).setIcon(
-				R.drawable.zip);
+		menu.add(0, ZIP_MENU, 1, R.string.zip_menu).setIcon(R.drawable.zip);
 		menu.add(0, DISTANCE_MENU, 2, R.string.distance_menu).setIcon(
 				R.drawable.distance);
 		menu.add(0, TYPE_MENU, 3, R.string.type_menu).setIcon(R.drawable.type);
@@ -375,8 +395,9 @@ public class HomeMapActivity extends MapActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MYLOCATION_MENU:
-			setLocation();
-			load();
+			if (setLocation()) {
+				load();
+			}
 			return true;
 		case DISTANCE_MENU:
 			showDialog(DISTANCE_DIALOG);

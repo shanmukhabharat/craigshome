@@ -106,8 +106,14 @@ public class HomeMapActivity extends MapActivity {
 		}
 
 		// LocationProvider lp = lm.getProvider(name);
+		
 		Location l = lm.getLastKnownLocation(name);
-
+		if (l == null) {
+			Log.w(getClass().getSimpleName(), "no last location");
+			showDialog(LOCATION_ERROR_DIALOG);
+			return false;
+		}
+		
 		mLocation.setLatitude(l.getLatitude());
 		mLocation.setLongitude(l.getLongitude());
 
